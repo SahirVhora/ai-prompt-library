@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Prompt Library — Curated prompts for Claude, GPT, DeepSeek & more</title>
+<meta name="description" content="Curated, tagged, searchable AI prompt collection. Copy, customise, and add your own prompts for Claude, GPT, DeepSeek, Gemini and other LLMs.">
+<meta property="og:title" content="AI Prompt Library">
+<meta property="og:description" content="Curated, tagged, searchable AI prompt collection for Claude, GPT, DeepSeek & more.">
+<meta property="og:type" content="website">
+<style>
+:root {
+  --bg: #0d1117;
+  --surface: #161b22;
+  --surface2: #1c2129;
+  --border: #30363d;
+  --text: #e6edf3;
+  --muted: #8b949e;
+  --accent: #58a6ff;
+  --green: #3fb950;
+  --orange: #d2991d;
+  --purple: #a371f7;
+  --red: #f85149;
+  --pink: #db61a2;
+  --radius: 10px;
+  --radius-sm: 6px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;
+  background:var(--bg);color:var(--text);line-height:1.6;min-height:100vh;
+}
+.container{max-width:1200px;margin:0 auto;padding:20px 20px 60px;}
+
+/* Header */
+.header{
+  padding:24px 0 20px;border-bottom:1px solid var(--border);margin-bottom:24px;
+}
+.header h1{font-size:1.5rem;font-weight:700;margin-bottom:6px;}
+.header h1 span{color:var(--accent);}
+.header .subtitle{font-size:0.88rem;color:var(--muted);}
+.header-actions{display:flex;gap:10px;margin-top:16px;flex-wrap:wrap;}
+
+/* Buttons */
+.btn{
+  padding:8px 16px;border-radius:var(--radius-sm);border:1px solid var(--border);
+  background:var(--surface2);color:var(--text);cursor:pointer;font-size:0.82rem;
+  font-weight:500;transition:all 0.15s;display:flex;align-items:center;gap:6px;
+}
+.btn:hover{border-color:var(--accent);background:#1f2937;}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff;}
+.btn.primary:hover{opacity:0.9;}
+.btn.small{padding:5px 12px;font-size:0.75rem;}
+
+/* Search & Filters */
+.toolbar{
+  display:flex;gap:12px;margin-bottom:20px;flex-wrap:wrap;align-items:center;
+}
+.search-box{
+  flex:1;min-width:240px;padding:10px 16px;border-radius:var(--radius-sm);
+  border:1px solid var(--border);background:var(--surface);color:var(--text);
+  font-size:0.9rem;
+}
+.search-box:focus{outline:none;border-color:var(--accent);}
+.filter-group{display:flex;gap:6px;flex-wrap:wrap;}
+.filter-pill{
+  padding:5px 14px;border-radius:20px;border:1px solid var(--border);
+  background:var(--surface);color:var(--muted);cursor:pointer;font-size:0.76rem;
+  font-weight:500;transition:all 0.15s;white-space:nowrap;
+}
+.filter-pill:hover{border-color:var(--muted);color:var(--text);}
+.filter-pill.active{background:var(--accent);border-color:var(--accent);color:#fff;}
+
+/* Stats */
+.stats{display:flex;gap:16px;margin-bottom:16px;flex-wrap:wrap;}
+.stat{font-size:0.8rem;color:var(--muted);}
+.stat strong{color:var(--text);}
+
+/* Prompt Grid */
+.prompt-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(360px,1fr));gap:14px;}
+.prompt-card{
+  background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
+  padding:16px;transition:border-color 0.15s;cursor:pointer;
+  display:flex;flex-direction:column;gap:10px;
+}
+.prompt-card:hover{border-color:var(--accent);}
+.prompt-card .card-header{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;}
+.prompt-card .card-title{font-weight:600;font-size:0.95rem;flex:1;}
+.prompt-card .card-desc{font-size:0.8rem;color:var(--muted);line-height:1.5;}
+.prompt-card .card-tags{display:flex;gap:5px;flex-wrap:wrap;}
+.tag{
+  padding:2px 10px;border-radius:20px;font-size:0.7rem;font-weight:500;
+  background:var(--surface2);color:var(--muted);
+}
+.tag.cat{background:rgba(88,166,255,0.12);color:var(--accent);}
+.tag.llm{background:rgba(163,113,247,0.12);color:var(--purple);}
+.prompt-card .card-actions{display:flex;gap:8px;margin-top:auto;}
+.prompt-card .prompt-body{
+  display:none;margin-top:8px;padding:12px;background:var(--bg);
+  border-radius:var(--radius-sm);border:1px solid var(--border);
+  font-family:'SF Mono','Fira Code',monospace;font-size:0.8rem;
+  line-height:1.6;white-space:pre-wrap;word-break:break-word;
+  max-height:300px;overflow-y:auto;
+}
+.prompt-card.expanded .prompt-body{display:block;}
+.prompt-card.expanded{border-color:var(--accent);}
+
+/* Modal */
+.modal-overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:1000;
+  display:none;align-items:center;justify-content:center;padding:20px;
+}
+.modal-overlay.active{display:flex;}
+.modal{
+  background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
+  padding:24px;max-width:560px;width:100%;max-height:90vh;overflow-y:auto;
+}
+.modal h2{font-size:1.15rem;margin-bottom:16px;}
+.form-group{margin-bottom:14px;}
+.form-group label{display:block;font-size:0.82rem;font-weight:600;margin-bottom:4px;color:var(--muted);}
+.form-group input,.form-group textarea,.form-group select{
+  width:100%;padding:8px 12px;border-radius:var(--radius-sm);border:1px solid var(--border);
+  background:var(--bg);color:var(--text);font-size:0.85rem;font-family:inherit;
+}
+.form-group textarea{min-height:120px;font-family:'SF Mono','Fira Code',monospace;font-size:0.8rem;resize:vertical;}
+.form-group input:focus,.form-group textarea:focus,.form-group select:focus{outline:none;border-color:var(--accent);}
+.modal-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:16px;}
+
+/* Toast */
+.toast{
+  position:fixed;bottom:30px;right:30px;background:var(--green);color:#000;
+  padding:12px 24px;border-radius:var(--radius);font-weight:600;font-size:0.9rem;
+  z-index:2000;animation:slideUp 0.3s ease;
+}
+@keyframes slideUp{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
+
+.empty-state{text-align:center;padding:60px 20px;color:var(--muted);}
+.empty-state h3{font-size:1.1rem;color:var(--text);margin-bottom:8px;}
+
+@media(max-width:768px){
+  .prompt-grid{grid-template-columns:1fr;}
+  .header h1{font-size:1.25rem;}
+}
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <h1>🧠 <span>AI Prompt Library</span></h1>
+    <p class="subtitle">Curated, tagged, searchable prompts for Claude, GPT, DeepSeek & more. Copy what works.</p>
+    <div class="header-actions">
+      <button class="btn primary" onclick="openAddModal()">＋ Add Prompt</button>
+      <button class="btn" onclick="exportPrompts()">📥 Export JSON</button>
+      <button class="btn" onclick="document.getElementById('importFile').click()">📤 Import JSON</button>
+      <input type="file" id="importFile" accept=".json" style="display:none" onchange="importPrompts(event)">
+    </div>
+  </div>
+
+  <div class="toolbar">
+    <input class="search-box" id="search" placeholder="Search prompts, tags, categories..." oninput="render()">
+    <div class="filter-group" id="catFilters"></div>
+    <div class="filter-group" id="llmFilters"></div>
+  </div>
+
+  <div class="stats" id="stats"></div>
+  <div class="prompt-grid" id="grid"></div>
+  <div class="empty-state" id="empty" style="display:none">
+    <h3>No prompts found</h3>
+    <p>Try a different search or add your own prompt.</p>
+  </div>
+</div>
+
+<!-- Add/Edit Modal -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <h2 id="modalTitle">Add Prompt</h2>
+    <div class="form-group"><label>Title</label><input id="mTitle" placeholder="e.g. Python Debugging Assistant"></div>
+    <div class="form-group"><label>Description</label><input id="mDesc" placeholder="What this prompt is good for"></div>
+    <div class="form-group"><label>Category</label><select id="mCat">
+      <option value="coding">Coding</option><option value="writing">Writing</option>
+      <option value="analysis">Analysis</option><option value="creative">Creative</option>
+      <option value="sap">SAP / SF</option><option value="productivity">Productivity</option>
+      <option value="education">Education</option><option value="other">Other</option>
+    </select></div>
+    <div class="form-group"><label>Target LLM</label><select id="mLLM">
+      <option value="any">Any LLM</option><option value="claude">Claude</option>
+      <option value="gpt">GPT / ChatGPT</option><option value="deepseek">DeepSeek</option><option value="gemini">Gemini</option>
+    </select></div>
+    <div class="form-group"><label>Tags (comma-separated)</label><input id="mTags" placeholder="python, debugging, code-review"></div>
+    <div class="form-group"><label>Prompt Text</label><textarea id="mPrompt" placeholder="Paste the full prompt here..."></textarea></div>
+    <input type="hidden" id="mEditId">
+    <div class="modal-actions">
+      <button class="btn" onclick="closeModal()">Cancel</button>
+      <button class="btn primary" onclick="savePrompt()">Save Prompt</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ─── SEEDED PROMPTS ──────────────────────────────────────────
+const SEEDS = [
+  {id:"s1",title:"Python Bug Hunter",description:"Systematic debugging with root-cause analysis",category:"coding",llm:"any",tags:["python","debugging","code-review"],prompt:"You are a senior Python developer debugging a codebase. Follow this 4-phase approach:\n\n1. REPRODUCE: Identify the exact conditions that trigger the bug\n2. ISOLATE: Find the minimal code path causing the issue\n3. ROOT CAUSE: Explain WHY the bug occurs at the language/runtime level\n4. FIX: Provide the minimal fix with before/after code\n\nNever suggest a fix before completing phase 3."},
+  {id:"s2",title:"Code Review — Security First",description:"Security-focused code review checklist",category:"coding",llm:"any",tags:["security","code-review","best-practices"],prompt:"Review this code for security vulnerabilities. Check for:\n- SQL injection / NoSQL injection\n- XSS vectors\n- Hardcoded secrets or API keys\n- Insecure deserialization\n- Missing input validation\n- Race conditions / TOCTOU\n- Path traversal\n- Insecure direct object references\n\nFor each finding, state: severity (critical/high/med/low), file:line, the vulnerable code, the exploit scenario, and the fix."},
+  {id:"s3",title:"Refactor to Clean Architecture",description:"Restructure messy code into clean patterns",category:"coding",llm:"claude",tags:["refactoring","architecture","clean-code"],prompt:"Act as a principal engineer. Refactor the following code following these principles:\n- Single Responsibility: each function/class does one thing\n- Dependency Inversion: depend on abstractions, not concretions\n- DRY: no duplicated logic\n- Readable: self-documenting names, no magic numbers\n- Testable: pure functions where possible, injected dependencies\n\nShow the refactored code with a brief explanation of each structural change."},
+  {id:"s4",title:"SQLite Query Optimizer",description:"Optimize slow SQLite queries",category:"coding",llm:"any",tags:["sqlite","database","performance"],prompt:"Analyze this SQLite query/schema for performance issues. Check:\n- Missing indexes on WHERE/JOIN columns\n- SELECT * where specific columns suffice\n- N+1 query patterns\n- Missing WAL mode / pragma optimizations\n- Subquery vs JOIN efficiency\n- EXPLAIN QUERY PLAN analysis\n\nProvide the optimized query with expected performance improvement."},
+  {id:"s5",title:"API Endpoint Design",description:"Design RESTful API endpoints",category:"coding",llm:"any",tags:["api","rest","design"],prompt:"Design a RESTful API for the following use case. Include:\n- Resource naming (nouns, plural)\n- HTTP methods (GET/POST/PUT/PATCH/DELETE)\n- Status codes (200/201/204/400/404/409/422/500)\n- Request/response schemas (JSON)\n- Pagination strategy (cursor-based preferred)\n- Error response format\n- Authentication header design\n\nProvide a complete OpenAPI 3.0 spec snippet."},
+  {id:"s6",title:"SAP SuccessFactors — EC Configuration Guide",description:"Generate SF EC implementation steps",category:"sap",llm:"any",tags:["sap","successfactors","ec","configuration"],prompt:"You are an SAP SuccessFactors Employee Central consultant. Given a client requirement, provide:\n\n1. FEASIBILITY: Is this possible with standard EC? Any license prerequisites?\n2. CONFIGURATION: Step-by-step in the SF admin UI (Manage Business Configuration, Manage Data, etc.)\n3. OBJECTS: Which MDF/XML objects need creating or modifying?\n4. RULES: Business rules, workflows, or event reasons needed\n5. TESTING: How to validate the configuration\n6. PITFALLS: Common mistakes or downstream impacts\n\nBe specific with field names, object types, and UI navigation paths."},
+  {id:"s7",title:"SAP SF — Audit Diff Analysis",description:"Analyze SF export diffs for risk",category:"sap",llm:"any",tags:["sap","audit","diff","risk"],prompt:"Analyze this SuccessFactors export comparison. For each object type (job codes, picklists, translations, etc.):\n\n1. Identify added/removed/changed records\n2. Assess risk level (HIGH/MED/LOW) based on:\n   - Object criticality (job/picklist/translation = critical)\n   - Downstream impact (integrations, reports, business rules)\n   - Data volume affected\n3. Recommend remediation priority\n\nFormat as a structured audit report with risk matrix."},
+  {id:"s8",title:"SAP SF — Position Management Design",description:"Design Position Management hierarchy",category:"sap",llm:"any",tags:["sap","position-management","org-structure"],prompt:"Design a Position Management hierarchy for SAP SuccessFactors. Consider:\n\n1. Position types (regular, shared, matrix, to-be-hired)\n2. Parent-child relationships and reporting lines\n3. Position attributes (job code, department, location, FTE)\n4. Mass changes — what tools to use\n5. Integration with Recruitment, Onboarding, Compensation\n6. Vacancy management and position filling rules\n7. Sync with Employee Central job relationships\n\nProvide a configuration approach with pros/cons for each design decision."},
+  {id:"s9",title:"SAP SF — Picklist Migration Strategy",description:"Plan picklist value migrations safely",category:"sap",llm:"any",tags:["sap","picklist","migration","data"],prompt:"Plan a picklist migration in SAP SuccessFactors. Outline:\n\n1. ANALYSIS: Map old values → new values, identify parent/child dependencies\n2. IMPACT: Which objects reference these picklists? (fields, business rules, reports)\n3. STRATEGY: In-place update vs. new picklist + cutover\n4. EXECUTION: Order of operations, rollback plan\n5. VALIDATION: Test cases, reconciliation queries\n6. COMMUNICATION: Who needs to know and when\n\nInclude SF-specific gotchas (propagation delays, cache issues, effective-dating)."},
+  {id:"s10",title:"Technical Blog Post",description:"Write a clear technical blog post",category:"writing",llm:"claude",tags:["blog","technical-writing","tutorial"],prompt:"Write a technical blog post about [TOPIC]. Structure:\n\n1. Hook: One sentence that makes the reader care\n2. Problem: What pain point does this solve?\n3. Solution overview: 2-3 sentences\n4. Step-by-step: Numbered, with code snippets where relevant\n5. Gotchas: Things that went wrong and how you fixed them\n6. Takeaways: 3 bullet points\n\nTone: conversational but precise. Assume the reader is technical but new to this specific topic. Max 1500 words."},
+  {id:"s11",title:"LinkedIn Post — Project Showcase",description:"Craft an engaging LinkedIn project post",category:"writing",llm:"any",tags:["linkedin","social-media","portfolio"],prompt:"Write a LinkedIn post about [PROJECT]. Format:\n\n- Hook line (question or bold statement)\n- What I built (1 sentence)\n- Why I built it (1 sentence)\n- One interesting technical challenge and how I solved it\n- Key result or metric\n- Call to action (link, ask for feedback)\n\nNo hashtags. Max 1200 characters. Natural voice — not corporate, not hype-y."},
+  {id:"s12",title:"README Generator",description:"Generate a professional GitHub README",category:"writing",llm:"any",tags:["github","readme","documentation"],prompt:"Generate a README.md for this project. Include:\n- Project name with emoji\n- One-line description\n- Live demo link (if applicable)\n- Screenshot/GIF\n- Features (bullet list)\n- Tech stack\n- Quick start (copy-paste commands)\n- Usage examples\n- Contributing guide (if open source)\n- License\n\nKeep it scannable. Use badges where appropriate."},
+  {id:"s13",title:"Meeting Notes → Action Items",description:"Extract action items from meeting transcripts",category:"productivity",llm:"any",tags:["meetings","notes","action-items"],prompt:"Extract action items from these meeting notes. For each:\n- Action: What needs to be done (clear, actionable verb)\n- Owner: Who is responsible\n- Deadline: When it's due\n- Priority: P0 (this week) / P1 (this sprint) / P2 (backlog)\n- Dependencies: What blocks this\n\nAlso produce a brief meeting summary (3 sentences max)."},
+  {id:"s14",title:"Weekly Review Template",description:"Structured weekly review and planning",category:"productivity",llm:"any",tags:["weekly-review","planning","reflection"],prompt:"Guide me through a weekly review. Ask me these questions one at a time, waiting for my response before continuing:\n\n1. What went well this week? (celebrate wins)\n2. What didn't go as planned? (identify blockers)\n3. What did I learn? (capture insights)\n4. What are the top 3 priorities for next week?\n5. What's one thing I should say no to?\n6. What would make next week a 10/10?\n\nAfter all answers, provide a concise weekly summary I can save."},
+  {id:"s15",title:"Data Analysis Plan",description:"Plan a data analysis approach",category:"analysis",llm:"any",tags:["data","analysis","planning"],prompt:"Given this dataset/problem, create an analysis plan:\n\n1. DATA PROFILE: Columns, types, missing values, distributions\n2. QUESTIONS: What specific questions should we answer?\n3. APPROACH: Statistical methods, ML models, or queries needed\n4. PITFALLS: Confounding variables, bias, data quality issues\n5. VISUALIZATION: Chart types that would best communicate findings\n6. DELIVERABLES: What the final output should look like\n\nBe specific about methods — name the exact statistical tests or algorithms."},
+  {id:"s16",title:"Competitive Analysis",description:"Analyze competitors from a product lens",category:"analysis",llm:"any",tags:["competitive-analysis","product","strategy"],prompt:"Perform a competitive analysis of [PRODUCT/COMPANY]. Structure:\n\n1. LANDSCAPE: Direct competitors, indirect competitors, potential entrants\n2. FEATURE MATRIX: Table comparing key features across competitors\n3. POSITIONING: How each competitor positions themselves (messaging, pricing, target audience)\n4. STRENGTHS: What each does better than alternatives\n5. GAPS: Underserved needs or market opportunities\n6. THREATS: Which competitor is most dangerous and why\n\nBe objective. Cite evidence where possible."},
+  {id:"s17",title:"Decision Matrix",description:"Make complex decisions with weighted criteria",category:"analysis",llm:"any",tags:["decision-making","frameworks","evaluation"],prompt:"Help me make a decision using a weighted decision matrix.\n\nOptions: [LIST OPTIONS]\n\nEvaluate across these criteria (I'll provide weights):\n- Cost (implementation + ongoing)\n- Time to value\n- Risk\n- Scalability\n- Maintenance burden\n- Team skill match\n\nScore each option 1-5 per criterion. Calculate weighted totals. Show the matrix as a table with clear recommendation and sensitivity analysis (which weight changes would flip the decision)."},
+  {id:"s18",title:"UI Copywriter",description:"Write clear, concise UI microcopy",category:"creative",llm:"claude",tags:["ux","copywriting","design"],prompt:"Write UI copy for the following components. Rules:\n- Button text: verb-first, max 3 words\n- Error messages: what happened + how to fix it, no blame\n- Empty states: what should be here + how to add it\n- Confirmation dialogs: action + consequence, clear yes/no\n- Tooltips: 1 line, adds context the label doesn't convey\n- Loading states: reassuring, specific about what's happening\n\nTone: friendly but not cute. Professional but not cold."},
+  {id:"s19",title:"Product Name Generator",description:"Generate creative product names",category:"creative",llm:"any",tags:["naming","branding","product"],prompt:"Generate 20 name ideas for [PRODUCT]. Rules:\n- 2-3 syllables max\n- Easy to spell after hearing it once\n- Domain name available (.com / .io / .dev)\n- No trademark conflicts with major products\n- Conveys the core benefit\n\nFor each name, provide: the name, a one-line tagline, and which naming style it uses (descriptive, evocative, compound, invented, acronym)."},
+  {id:"s20",title:"Lesson Plan — UK Primary",description:"Create a UK primary school lesson plan",category:"education",llm:"any",tags:["teaching","lesson-plan","primary"],prompt:"Create a UK primary school lesson plan for Year [N]. Include:\n\n1. LEARNING OBJECTIVE: What students will know/do by the end (use \"I can...\" statements)\n2. NATIONAL CURRICULUM LINK: Which programme of study this addresses\n3. STARTER: 5-min warm-up activity\n4. MAIN ACTIVITY: Step-by-step with differentiation (support + stretch)\n5. PLENARY: How to assess understanding\n6. RESOURCES: What you need to prepare\n7. KEY VOCABULARY: Words to pre-teach\n\nAlign with UK National Curriculum. Use concrete examples."},
+  {id:"s21",title:"11+ Exam Question Generator",description:"Generate 11+ practice questions",category:"education",llm:"any",tags:["11plus","grammar-school","exam-prep"],prompt:"Generate 10 practice questions for the UK 11+ exam. Subject: [English/Maths/Verbal Reasoning/Non-Verbal Reasoning].\n\nFor each question:\n- Question text\n- Multiple choice options (A-E)\n- Correct answer\n- Brief explanation of why it's correct\n- Time target (how long a student should spend)\n\nDifficulty: mix of standard and challenging. Format suitable for Year 5/6 students."},
+  {id:"s22",title:"Git Commit Message Generator",description:"Write conventional commit messages from diffs",category:"coding",llm:"any",tags:["git","commits","conventional-commits"],prompt:"Generate a conventional commit message for this diff. Format:\n\n<type>(<scope>): <description>\n\nTypes: feat, fix, refactor, perf, docs, test, chore, style\nScope: the module/component affected (lowercase, hyphenated)\nDescription: imperative mood, max 72 chars, no period at end\n\nIf the diff is large, produce a bullet list of changes in the body.\nInclude breaking changes with BREAKING CHANGE: prefix if applicable."},
+  {id:"s23",title:"Shell Script Reviewer",description:"Review bash scripts for safety and correctness",category:"coding",llm:"any",tags:["bash","shell","scripting"],prompt:"Review this shell script for:\n- Missing error handling (set -e, set -u, set -o pipefail)\n- Unquoted variable expansions (word splitting, globbing)\n- Unsafe rm -rf patterns\n- Command injection vectors (eval, xargs without -0)\n- Portability issues (bashisms in #!/bin/sh)\n- Race conditions (temp files, TOCTOU)\n- Missing exit code checks on critical commands\n\nFor each issue, show the problematic line and the fix."},
+  {id:"s24",title:"CRON Job Planner",description:"Design reliable cron job schedules",category:"coding",llm:"any",tags:["cron","scheduling","devops"],prompt:"Design a cron schedule for this task. Provide:\n\n1. SCHEDULE: crontab expression with explanation\n2. OVERLAP GUARD: How to prevent concurrent runs (flock, pidfile, etc.)\n3. ERROR HANDLING: What to do on failure (retry, alert, skip)\n4. LOGGING: What to log and rotation strategy\n5. MONITORING: Health check or dead-man's-switch approach\n6. TESTING: How to verify it works before deploying\n\nAssume the script may take 30-90 seconds and must not overlap."},
+  {id:"s25",title:"Personal Brand Statement",description:"Craft a compelling personal brand statement",category:"writing",llm:"any",tags:["personal-brand","career","linkedin"],prompt:"Help me craft a personal brand statement. Ask me these questions one at a time:\n\n1. What do you do? (role, industry, speciality)\n2. Who do you help? (target audience/clients)\n3. What problem do you solve for them?\n4. What makes your approach different?\n5. What's a result you're proud of?\n\nThen synthesize into 3 versions:\n- One-liner (for LinkedIn headline, max 220 chars)\n- Short bio (for conference/guest post, ~80 words)\n- Long version (for About page, ~200 words)"},
+  {id:"s26",title:"UK Property Area Analysis",description:"Analyze a UK area for property investment",category:"analysis",llm:"any",tags:["property","uk","investment","analysis"],prompt:"Analyze this UK postcode/area for property investment potential. Consider:\n\n1. PRICE TRENDS: Recent sold prices, YoY change, forecast\n2. DEMOGRAPHICS: Population growth, age profile, employment\n3. TRANSPORT: Commute times to major cities, station proximity\n4. SCHOOLS: Ofsted ratings, catchment quality\n5. DEVELOPMENT: Planned infrastructure, new builds, regeneration zones\n6. YIELD: Rental yield estimate vs. UK average\n7. RISKS: Flood risk, crime stats, leasehold issues\n\nProvide a balanced view — no hype. Cite data sources."},
+];
+
+// ─── STATE ───────────────────────────────────────────────────
+let prompts = [];
+let customPrompts = JSON.parse(localStorage.getItem('ai-prompt-library') || '[]');
+let activeCat = null;
+let activeLLM = null;
+
+function getAllPrompts(){return [...SEEDS,...customPrompts];}
+
+// ─── RENDER ──────────────────────────────────────────────────
+function render(){
+  const search = document.getElementById('search').value.toLowerCase();
+  let filtered = getAllPrompts();
+  
+  if(activeCat) filtered = filtered.filter(p => p.category === activeCat);
+  if(activeLLM) filtered = filtered.filter(p => p.llm === activeLLM || p.llm === 'any');
+  if(search){
+    filtered = filtered.filter(p =>
+      p.title.toLowerCase().includes(search) ||
+      p.description.toLowerCase().includes(search) ||
+      p.tags.some(t => t.toLowerCase().includes(search)) ||
+      p.category.toLowerCase().includes(search) ||
+      p.prompt.toLowerCase().includes(search)
+    );
+  }
+  
+  document.getElementById('stats').innerHTML = `
+    <div class="stat">Showing <strong>${filtered.length}</strong> of <strong>${getAllPrompts().length}</strong> prompts</div>
+    ${search ? `<div class="stat">Search: <strong>"${search.substring(0,40)}"</strong></div>` : ''}
+  `;
+  
+  const grid = document.getElementById('grid');
+  if(!filtered.length){
+    grid.innerHTML = '';
+    document.getElementById('empty').style.display = 'block';
+  }else{
+    document.getElementById('empty').style.display = 'none';
+    grid.innerHTML = filtered.map(p => `
+      <div class="prompt-card" id="card-${p.id}">
+        <div class="card-header">
+          <div class="card-title">${esc(p.title)}</div>
+          <button class="btn small" onclick="event.stopPropagation();copyPrompt('${p.id}')" title="Copy prompt">📋</button>
+        </div>
+        <div class="card-desc">${esc(p.description)}</div>
+        <div class="card-tags">
+          <span class="tag cat">${esc(p.category)}</span>
+          <span class="tag llm">${esc(p.llm)}</span>
+          ${p.tags.slice(0,4).map(t => `<span class="tag">${esc(t)}</span>`).join('')}
+        </div>
+        <div class="prompt-body">${esc(p.prompt)}</div>
+        <div class="card-actions">
+          <button class="btn small" onclick="event.stopPropagation();toggleExpand('${p.id}')">🔽 Expand</button>
+          <button class="btn small" onclick="event.stopPropagation();copyPrompt('${p.id}')">📋 Copy</button>
+          ${customPrompts.some(cp=>cp.id===p.id) ? `<button class="btn small" onclick="event.stopPropagation();deletePrompt('${p.id}')" style="color:var(--red)">🗑</button>` : ''}
+        </div>
+      </div>
+    `).join('');
+  }
+  
+  renderFilters();
+}
+
+function renderFilters(){
+  const all = getAllPrompts();
+  const cats = [...new Set(all.map(p => p.category))].sort();
+  const llms = [...new Set(all.map(p => p.llm))].sort();
+  
+  document.getElementById('catFilters').innerHTML = cats.map(c => 
+    `<button class="filter-pill ${activeCat===c?'active':''}" onclick="setCat('${c}')">${c}</button>`
+  ).join('');
+  
+  document.getElementById('llmFilters').innerHTML = llms.map(l =>
+    `<button class="filter-pill ${activeLLM===l?'active':''}" onclick="setLLM('${l}')">${l}</button>`
+  ).join('');
+}
+
+function setCat(c){activeCat = activeCat===c ? null : c; render();}
+function setLLM(l){activeLLM = activeLLM===l ? null : l; render();}
+
+function toggleExpand(id){
+  const card = document.getElementById('card-'+id);
+  card.classList.toggle('expanded');
+  const btn = card.querySelector('.card-actions .btn');
+  btn.textContent = card.classList.contains('expanded') ? '🔼 Collapse' : '🔽 Expand';
+}
+
+function copyPrompt(id){
+  const p = getAllPrompts().find(p => p.id === id);
+  if(!p) return;
+  navigator.clipboard.writeText(p.prompt).then(() => toast('📋 Prompt copied!'));
+}
+
+// ─── MODAL ───────────────────────────────────────────────────
+function openAddModal(){
+  document.getElementById('modalTitle').textContent = 'Add Prompt';
+  document.getElementById('mEditId').value = '';
+  document.getElementById('mTitle').value = '';
+  document.getElementById('mDesc').value = '';
+  document.getElementById('mCat').value = 'coding';
+  document.getElementById('mLLM').value = 'any';
+  document.getElementById('mTags').value = '';
+  document.getElementById('mPrompt').value = '';
+  document.getElementById('modalOverlay').classList.add('active');
+}
+
+function closeModal(){document.getElementById('modalOverlay').classList.remove('active');}
+
+function savePrompt(){
+  const editId = document.getElementById('mEditId').value;
+  const prompt = {
+    id: editId || 'c' + Date.now(),
+    title: document.getElementById('mTitle').value.trim(),
+    description: document.getElementById('mDesc').value.trim(),
+    category: document.getElementById('mCat').value,
+    llm: document.getElementById('mLLM').value,
+    tags: document.getElementById('mTags').value.split(',').map(t=>t.trim()).filter(Boolean),
+    prompt: document.getElementById('mPrompt').value.trim(),
+  };
+  if(!prompt.title || !prompt.prompt){toast('❌ Title and prompt required');return;}
+  
+  if(editId){
+    customPrompts = customPrompts.map(p => p.id === editId ? prompt : p);
+  }else{
+    customPrompts.push(prompt);
+  }
+  localStorage.setItem('ai-prompt-library', JSON.stringify(customPrompts));
+  closeModal();
+  render();
+  toast('✅ Prompt saved!');
+}
+
+function deletePrompt(id){
+  if(!confirm('Delete this prompt?')) return;
+  customPrompts = customPrompts.filter(p => p.id !== id);
+  localStorage.setItem('ai-prompt-library', JSON.stringify(customPrompts));
+  render();
+  toast('🗑 Prompt deleted');
+}
+
+// ─── IMPORT / EXPORT ─────────────────────────────────────────
+function exportPrompts(){
+  const data = JSON.stringify(getAllPrompts(), null, 2);
+  const blob = new Blob([data], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');a.href = url;a.download = 'ai-prompts.json';a.click();
+  URL.revokeObjectURL(url);
+  toast('📥 Exported all prompts');
+}
+
+function importPrompts(e){
+  const file = e.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = function(ev){
+    try{
+      const imported = JSON.parse(ev.target.result);
+      if(!Array.isArray(imported)) throw new Error('Expected array');
+      const newPrompts = imported.filter(p => !SEEDS.some(s => s.id === p.id) && !customPrompts.some(c => c.id === p.id));
+      customPrompts = [...customPrompts, ...newPrompts.map(p => ({...p, id: p.id || 'c'+Date.now()+Math.random().toString(36).slice(2,8)}))];
+      localStorage.setItem('ai-prompt-library', JSON.stringify(customPrompts));
+      render();
+      toast(`📤 Imported ${newPrompts.length} prompts`);
+    }catch(err){toast('❌ Invalid JSON file');}
+  };
+  reader.readAsText(file);
+  e.target.value = '';
+}
+
+// ─── UTILS ───────────────────────────────────────────────────
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function toast(msg){
+  const t = document.createElement('div');t.className='toast';t.textContent=msg;
+  document.body.appendChild(t);setTimeout(()=>t.remove(),2500);
+}
+
+// ─── KEYBOARD ────────────────────────────────────────────────
+document.addEventListener('keydown', e => {
+  if(e.key === 'Escape') closeModal();
+  if((e.ctrlKey||e.metaKey) && e.key === 'k'){e.preventDefault();document.getElementById('search').focus();}
+});
+
+// Click outside modal to close
+document.getElementById('modalOverlay').addEventListener('click', function(e){if(e.target===this)closeModal();});
+
+// ─── BOOT ────────────────────────────────────────────────────
+render();
+</script>
+</body>
+</html>
