@@ -176,19 +176,13 @@ body{
     <h2 id="modalTitle">Add Prompt</h2>
     <div class="form-group"><label>Title</label><input id="mTitle" placeholder="e.g. Python Debugging Assistant"></div>
     <div class="form-group"><label>Description</label><input id="mDesc" placeholder="What this prompt is good for"></div>
-    <div class="form-group"><label>Category</label><select id="mCat">
-      <option value="coding">Coding</option><option value="writing">Writing</option>
-      <option value="analysis">Analysis</option><option value="creative">Creative</option>
-      <option value="sap">SAP / SF</option><option value="productivity">Productivity</option>
-      <option value="education">Education</option><option value="other">Other</option>
-    </select></div>
-    <div class="form-group"><label>Target LLM</label><select id="mLLM">
-      <option value="any">Any LLM</option><option value="claude">Claude</option>
-      <option value="gpt">GPT / ChatGPT</option><option value="deepseek">DeepSeek</option><option value="gemini">Gemini</option>
-    </select></div>
+    <div class="form-group"><label>Category (type any or pick from existing)</label><input id="mCat" list="catSuggestions" placeholder="e.g. coding, sap, devops, research..."></div>
+    <div class="form-group"><label>Target LLM (type any or pick)</label><input id="mLLM" list="llmSuggestions" placeholder="e.g. any, claude, gpt, deepseek, gemini, mistral..."></div>
     <div class="form-group"><label>Tags (comma-separated)</label><input id="mTags" placeholder="python, debugging, code-review"></div>
     <div class="form-group"><label>Prompt Text</label><textarea id="mPrompt" placeholder="Paste the full prompt here..."></textarea></div>
     <input type="hidden" id="mEditId">
+<datalist id="catSuggestions"></datalist>
+<datalist id="llmSuggestions"></datalist>
     <div class="modal-actions">
       <button class="btn" onclick="closeModal()">Cancel</button>
       <button class="btn primary" onclick="savePrompt()">Save Prompt</button>
@@ -225,6 +219,10 @@ const SEEDS = [
   {id:"s24",title:"CRON Job Planner",description:"Design reliable cron job schedules",category:"coding",llm:"any",tags:["cron","scheduling","devops"],prompt:"Design a cron schedule for this task. Provide:\n\n1. SCHEDULE: crontab expression with explanation\n2. OVERLAP GUARD: How to prevent concurrent runs (flock, pidfile, etc.)\n3. ERROR HANDLING: What to do on failure (retry, alert, skip)\n4. LOGGING: What to log and rotation strategy\n5. MONITORING: Health check or dead-man's-switch approach\n6. TESTING: How to verify it works before deploying\n\nAssume the script may take 30-90 seconds and must not overlap."},
   {id:"s25",title:"Personal Brand Statement",description:"Craft a compelling personal brand statement",category:"writing",llm:"any",tags:["personal-brand","career","linkedin"],prompt:"Help me craft a personal brand statement. Ask me these questions one at a time:\n\n1. What do you do? (role, industry, speciality)\n2. Who do you help? (target audience/clients)\n3. What problem do you solve for them?\n4. What makes your approach different?\n5. What's a result you're proud of?\n\nThen synthesize into 3 versions:\n- One-liner (for LinkedIn headline, max 220 chars)\n- Short bio (for conference/guest post, ~80 words)\n- Long version (for About page, ~200 words)"},
   {id:"s26",title:"UK Property Area Analysis",description:"Analyze a UK area for property investment",category:"analysis",llm:"any",tags:["property","uk","investment","analysis"],prompt:"Analyze this UK postcode/area for property investment potential. Consider:\n\n1. PRICE TRENDS: Recent sold prices, YoY change, forecast\n2. DEMOGRAPHICS: Population growth, age profile, employment\n3. TRANSPORT: Commute times to major cities, station proximity\n4. SCHOOLS: Ofsted ratings, catchment quality\n5. DEVELOPMENT: Planned infrastructure, new builds, regeneration zones\n6. YIELD: Rental yield estimate vs. UK average\n7. RISKS: Flood risk, crime stats, leasehold issues\n\nProvide a balanced view — no hype. Cite data sources."},
+  {id:"s27",title:"Docker Compose Generator",description:"Generate Docker Compose files from requirements",category:"devops",llm:"any",tags:["docker","compose","infrastructure","deployment"],prompt:"Generate a Docker Compose file for this stack. Include:\n\n1. SERVICES: Each service with image, ports, volumes, env vars\n2. NETWORKS: Internal network for inter-service communication\n3. VOLUMES: Named volumes for persistent data\n4. HEALTHCHECKS: For each critical service\n5. RESTART POLICIES: unless-stopped for production\n6. RESOURCE LIMITS: CPU/memory constraints\n\nUse :latest tags only where appropriate (pin versions for databases). Add comments explaining each service's role."},
+  {id:"s28",title:"Research Paper Summarizer",description:"Extract key findings from academic papers",category:"research",llm:"claude",tags:["academic","papers","summary","literature-review"],prompt:"Summarize this academic paper. Structure:\n\n1. RESEARCH QUESTION: What problem does this paper address?\n2. METHODOLOGY: How did they study it? (approach, data, sample size)\n3. KEY FINDINGS: Top 3-5 results with effect sizes or confidence intervals if available\n4. LIMITATIONS: What caveats do the authors acknowledge?\n5. SIGNIFICANCE: Why does this matter to the field?\n6. CONNECTIONS: How does this relate to [OTHER PAPER / TOPIC]?\n\nWrite for an informed but non-specialist audience. Max 400 words."},
+  {id:"s29",title:"Hermes Agent Skill Author",description:"Write SKILL.md files for Hermes Agent",category:"ai-tools",llm:"any",tags:["hermes","agent","skill","automation"],prompt:"Write a SKILL.md file for Hermes Agent that teaches it how to [TASK]. Include:\n\n1. YAML FRONTMATTER: name, description, version, tags\n2. WHEN TO USE: Trigger conditions — when should the agent load this skill?\n3. NUMBERED STEPS: Exact commands, tool names, parameters\n4. PITFALLS: What goes wrong, OS-specific issues, error messages to watch for\n5. VERIFICATION: How to confirm the task succeeded\n6. REFERENCES: Links to docs, related skills, templates\n\nUse imperative mood. Be specific about tool names and parameter formats. Assume the agent has access to terminal, file, web, and browser tools."},
+  {id:"s30",title:"UK Tax Estimator Script",description:"Write a Python script for UK tax estimation",category:"coding",llm:"any",tags:["python","tax","uk","finance","script"],prompt:"Write a Python script that estimates UK income tax and National Insurance. Requirements:\n\n1. Accept annual salary as input (command-line arg or stdin)\n2. Calculate: Income Tax (personal allowance, basic/higher/additional rates), Employee NI (Class 1), Employer NI\n3. Handle: salary sacrifice, pension contributions (deduct before tax), student loan (Plan 2)\n4. Output: gross salary, tax-free allowance, taxable income, tax breakdown by band, NI breakdown, take-home pay (monthly + annual)\n5. Use current UK tax year thresholds (2025/26 or latest available)\n6. Pure stdlib — no external dependencies"},
 ];
 
 // ─── STATE ───────────────────────────────────────────────────
@@ -293,12 +291,15 @@ function renderFilters(){
   const cats = [...new Set(all.map(p => p.category))].sort();
   const llms = [...new Set(all.map(p => p.llm))].sort();
   
+  document.getElementById('catSuggestions').innerHTML = cats.map(c => `<option value="${esc(c)}">`).join('');
+  document.getElementById('llmSuggestions').innerHTML = llms.map(l => `<option value="${esc(l)}">`).join('');
+  
   document.getElementById('catFilters').innerHTML = cats.map(c => 
-    `<button class="filter-pill ${activeCat===c?'active':''}" onclick="setCat('${c}')">${c}</button>`
+    `<button class="filter-pill ${activeCat===c?'active':''}" onclick="setCat('${c.replace(/'/g,"\\'")}')">${esc(c)}</button>`
   ).join('');
   
   document.getElementById('llmFilters').innerHTML = llms.map(l =>
-    `<button class="filter-pill ${activeLLM===l?'active':''}" onclick="setLLM('${l}')">${l}</button>`
+    `<button class="filter-pill ${activeLLM===l?'active':''}" onclick="setLLM('${l.replace(/'/g,"\\'")}')">${esc(l)}</button>`
   ).join('');
 }
 
@@ -324,7 +325,7 @@ function openAddModal(){
   document.getElementById('mEditId').value = '';
   document.getElementById('mTitle').value = '';
   document.getElementById('mDesc').value = '';
-  document.getElementById('mCat').value = 'coding';
+  document.getElementById('mCat').value = '';
   document.getElementById('mLLM').value = 'any';
   document.getElementById('mTags').value = '';
   document.getElementById('mPrompt').value = '';
